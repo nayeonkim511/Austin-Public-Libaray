@@ -9,12 +9,23 @@ const localizer = momentLocalizer(moment); //globalize Localizer
 
 function App() {
 
-  var json = JSON.stringify(Records);
+  var array = Records.apl_event;
+
+  const convertedEvents = array.map((event) => ({
+    id: event.nid,
+    title: event.title,
+    start: new Date(parseInt(event.field_slr_time_start) * 1000),
+    end: new Date(parseInt(event.field_slr_time_end) * 1000),
+    allDay: 0,
+  }));
+
+  console.log(convertedEvents);
+
   return (
     <div className="App">
       <Calendar
         localizer={localizer}
-        events={json.apl_event}
+        events={convertedEvents}
         startAccessor="start"
         endAccessor="end"
       />
