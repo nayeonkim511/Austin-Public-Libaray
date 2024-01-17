@@ -4,16 +4,26 @@ import { Calendar, momentLocalizer } from "react-big-calendar";
 import Records from "./event_json_files/apl_events.json";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "@fontsource/inter";
 
 const localizer = momentLocalizer(moment);
 
+const CustomMonthTitle = ({label}) => (
+  <div className = "customheader">label</div>
+)
+
 const CustomEvent = ({ event, onClick }) => (
   <div onClick={() => onClick(event)}>
-    <span style={{ fontWeight: "600", whiteSpace: "normal" }}>
-      {event.title}
-    </span>
-    <br />
-    {moment(event.start).format("LT")} - {moment(event.end).format("LT")}
+    <div className="container">
+      <div className="colorbar"></div>
+      <div className = "colorlabel">
+        <span style={{ fontWeight: "600", whiteSpace: "normal" }}>
+          {event.title}
+        </span>
+        <br />
+        {moment(event.start).format("LT")} - {moment(event.end).format("LT")}
+      </div>
+    </div>
   </div>
 );
 
@@ -175,6 +185,9 @@ function App() {
     <div className="App">
       <div className="main-container">
         <div className="filters-sidebar">
+          <div>
+            <b>FILTERS</b>
+          </div>
           <div className="search-container">
             <input
               type="text"
@@ -188,14 +201,14 @@ function App() {
               All Events
             </button>
             {allEventsOpen && (
-              <div>
+              <div className="checkbox">
                 <input
                   type="checkbox"
                   id="all-events"
                   checked={showAllEvents}
                   onChange={handleAllEventsChange}
                 />
-                <label htmlFor="all-events">Show All</label>
+                <label htmlFor="all-events"> Show All</label>
               </div>
             )}
           </div>
@@ -203,7 +216,7 @@ function App() {
             <button onClick={() => setAgeOpen(!ageOpen)}>Filter by Age</button>
             {ageOpen &&
               uniqueAges.map((age) => (
-                <div key={age}>
+                <div key={age} className="checkbox">
                   <input
                     type="checkbox"
                     id={`age-${age}`}
@@ -220,7 +233,7 @@ function App() {
             </button>
             {categoryOpen &&
               uniqueCategories.map((category) => (
-                <div key={category}>
+                <div key={category} className="checkbox">
                   <input
                     type="checkbox"
                     id={`category-${category}`}
@@ -256,7 +269,11 @@ function App() {
               </div>
             )}
           />
-          <EventModal show={modalVisible} onClose={closeModal} event={selectedEvent} />
+          <EventModal
+            show={modalVisible}
+            onClose={closeModal}
+            event={selectedEvent}
+          />
           <SearchResultsModal
             results={searchResults}
             show={searchResults.length > 0}
