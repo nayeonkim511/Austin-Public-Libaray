@@ -8,8 +8,11 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 const localizer = momentLocalizer(moment);
 
 function App() {
-  const eventsArray = Records.apl_event;
+  let url = 'http://dev-apl2023.pantheonsite.io/api/event';
+  let response = fetch(url);
 
+  //const eventsArray = Records.apl_event;
+  const eventsArray = response;
   const [selectedAges, setSelectedAges] = useState({});
 
   const uniqueAges = useMemo(() => {
@@ -23,7 +26,7 @@ function App() {
   const handleCheckboxChange = (age) => {
     setSelectedAges((prevSelectedAges) => ({
       ...prevSelectedAges,
-      [age]: !prevSelectedAges[age]
+      [age]: !prevSelectedAges[age],
     }));
   };
 
@@ -31,7 +34,7 @@ function App() {
     const selectedAgeGroups = Object.entries(selectedAges).filter(
       ([, value]) => value
     ).length;
-    
+
     if (selectedAgeGroups === 0) {
       return eventsArray.map((event) => ({
         id: event.nid,
