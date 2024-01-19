@@ -1,3 +1,11 @@
+body {
+  font-family: "Inter";
+}
+
+.rbc-calendar {
+  font-family: "Inter";
+}
+
 .App {
   /* height : 700px; */
 }
@@ -104,6 +112,38 @@
   border-bottom: 1px solid #ddd;
   }
 
+  .checkbox {
+    background: linear-gradient(to right, #ed0e0e 5%,#ed0e0e 5%,#ed0e0e 5%,white 5%,white 100%);
+    border-radius: 7px;
+    width: 250px;
+    border: 1.5px solid rgb(143, 143, 143);
+    height: 15px;
+    padding: 10px;
+    margin: 20px;
+  }
 
+  .font {
+  font-family: "Inter";
+  }
 
+  .colorbar {
+    height: 100px;
+    width: 7px;
+    background-color: #ed0e0e;
+    border-radius: 20px;
+  }
 
+  .container {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .colorlabel {
+    padding-left: 10px;
+    width: 120px;
+    font-size: 14px;
+  }
+
+  .customheader {
+    font-size: 6px;
+  }

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@fontsource/inter": "^5.0.16",
     "moment": "^2.29.4",
     "react-calendar": "^4.6.0"
   }
