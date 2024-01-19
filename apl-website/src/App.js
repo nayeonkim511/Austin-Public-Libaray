@@ -19,7 +19,6 @@ const CustomEvent = ({ event, onClick }) => (
 
 const SearchResultsModal = ({ results, show, onClose }) => {
   if (!show) return null;
-
   return (
     <div className="search-results-modal">
       <div className="search-results-content">
@@ -215,9 +214,7 @@ function App() {
               ))}
           </div>
           <div className="filter-dropdown">
-            <button onClick={() => setCategoryOpen(!categoryOpen)}>
-              Filter by Category
-            </button>
+            <button onClick={() => setCategoryOpen(!categoryOpen)}>Filter by Category</button>
             {categoryOpen &&
               uniqueCategories.map((category) => (
                 <div key={category}>
