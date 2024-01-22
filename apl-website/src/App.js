@@ -71,12 +71,14 @@ function App() {
   const [events] = useState(Records.apl_event);
   const [selectedAges, setSelectedAges] = useState(new Set());
   const [selectedCategories, setSelectedCategories] = useState(new Set());
+  const [selectedLocations, setSelectedLocations] = useState(new Set());
   const [showAllEvents, setShowAllEvents] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [allEventsOpen, setAllEventsOpen] = useState(false);
   const [ageOpen, setAgeOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [locationOpen, setLocationOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
@@ -102,10 +104,16 @@ function App() {
     return Array.from(categories);
   }, [events]);
 
+  const uniqueLocations = useMemo(() => {
+    const locations = new Set(events.map((event) => event.field_event_loc));
+    return Array.from(locations);
+  }, [events]);
+
   const handleAllEventsChange = () => {
     setShowAllEvents(!showAllEvents);
     setSelectedAges(new Set());
     setSelectedCategories(new Set());
+    setSelectedLocations(new Set());
   };
 
   const handleAgeChange = (age) => {
@@ -130,6 +138,17 @@ function App() {
     setShowAllEvents(newCategories.size === 0 && selectedAges.size === 0);
   };
 
+  const handleLocationChange = (location) => {
+    const newLocations = new Set(selectedLocations);
+    if (newLocations.has(location)) {
+      newLocations.delete(location);
+    } else {
+      newLocations.add(location);
+    }
+    setSelectedLocations(newLocations);
+    setShowAllEvents(newLocations.size === 0);
+  }
+
   const filteredEvents = useMemo(() => {
     if (showAllEvents) return events;
 
@@ -140,9 +159,12 @@ function App() {
       const categoryMatch =
         selectedCategories.size === 0 ||
         selectedCategories.has(event.event_category);
-      return ageMatch && categoryMatch;
+      const locationMatch =
+        selectedLocations.size === 0 ||
+        selectedLocations.has(event.field_event_loc);
+      return ageMatch && categoryMatch && locationMatch;
     });
-  }, [events, showAllEvents, selectedAges, selectedCategories]);
+  }, [events, showAllEvents, selectedAges, selectedCategories, selectedLocations]);
 
   const convertedEvents = filteredEvents.map((event) => ({
     id: event.nid,
@@ -238,6 +260,21 @@ function App() {
                     onChange={() => handleCategoryChange(category)}
                   />
                   <label htmlFor={`category-${category}`}>{category}</label>
+                </div>
+              ))}
+          </div>
+          <div className="filter-dropdown">
+            <button onClick={() => setLocationOpen(!locationOpen)}>Filter by Location</button>
+            {locationOpen &&
+              uniqueCategories.map((location) => (
+                <div key={location} className="checkbox">
+                  <input
+                    type="checkbox"
+                    id={`category-${location}`}
+                    checked={selectedCategories.has(location)}
+                    onChange={() => handleLocationChange(location)}
+                  />
+                  <label htmlFor={`Location-${location}`}>{location}</label>
                 </div>
               ))}
           </div>
