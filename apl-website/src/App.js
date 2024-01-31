@@ -5,6 +5,7 @@ import Records from "./event_json_files/apl_events.json";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "@fontsource/inter";
+import ColorCheckbox from "./components/ColorCheckbox.js";
 
 const localizer = momentLocalizer(moment);
 
@@ -262,7 +263,9 @@ function App() {
               ))}
           </div>
           <div className="filter-dropdown">
-            <button onClick={() => setCategoryOpen(!categoryOpen)}>Filter by Category</button>
+            <button onClick={() => setCategoryOpen(!categoryOpen)}>
+              Filter by Category
+            </button>
             {categoryOpen &&
               uniqueCategories.map((category) => (
                 <div key={category} className="checkbox">
@@ -277,17 +280,27 @@ function App() {
               ))}
           </div>
           <div className="filter-dropdown">
-            <button onClick={() => setLocationOpen(!locationOpen)}>Filter by Location</button>
+            <button onClick={() => setLocationOpen(!locationOpen)}>
+              Filter by Location
+            </button>
             {locationOpen &&
               uniqueCategories.map((location) => (
-                <div key={location} className="checkbox">
-                  <input
+                <div key={location}>
+                  {
+                    /* <input
                     type="checkbox"
                     id={`category-${location}`}
                     checked={selectedCategories.has(location)}
                     onChange={() => handleLocationChange(location)}
-                  />
-                  <label htmlFor={`Location-${location}`}>{location}</label>
+                  /> */
+                    <ColorCheckbox
+                      id={`${location}`}
+                      checked={selectedCategories.has(location)}
+                      onChange={() => handleLocationChange(location)}
+                    />
+                  }
+
+                  {/* <label htmlFor={`Location-${location}`}>{location}</label> */}
                 </div>
               ))}
           </div>
