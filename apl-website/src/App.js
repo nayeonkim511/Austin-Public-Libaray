@@ -52,8 +52,18 @@ const EventModal = ({ show, onClose, event }) => {
       <div className="modal">
         <h2>{event.title}</h2>
         <p>Time: {moment(event.start).format('LT')} - {moment(event.end).format('LT')}</p>
+        
+        {/* Location */}
         <p>Location: {event.location}</p>
-        {/* Include your event image and details here */}
+
+        {/* Event Description */}
+        <div className="event-description">
+          <h3>Description</h3>
+          {/* <p>{event.desc}</p> */}
+        </div>
+
+        {/* Event Image (if applicable) */}
+        {/* <img src={event.imageUrl} alt="Event" /> */}
 
         <div className="modal-buttons">
           <button onClick={() => {}}><i className="fas fa-share-alt"></i> Share</button>
@@ -66,6 +76,7 @@ const EventModal = ({ show, onClose, event }) => {
     </div>
   );
 };
+
 
 function App() {
   const [events] = useState(Records.apl_event);
@@ -171,6 +182,8 @@ function App() {
     title: event.title,
     start: new Date(parseInt(event.field_slr_time_start) * 1000),
     end: new Date(parseInt(event.field_slr_time_end) * 1000),
+    desc: event.body,
+    location: event.field_event_loc,
     allDay: true,
   }));
 
