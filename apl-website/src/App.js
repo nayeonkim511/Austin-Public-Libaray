@@ -47,54 +47,55 @@ const SearchResultsModal = ({ results, show, onClose }) => {
 
 const EventModal = ({ show, onClose, event }) => {
   const [googleUser, setGoogleUser] = useState(null);
-  // console.log("Client id: " + process.env.REACT_APP_GOOGLE_CLIENT_ID);
-  // Initialize Google Identity Services
+  
   useEffect(() => {
-    window.onGoogleLibraryLoad = () => {
-      window.google.accounts.id.initialize({
-        client_id: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
-        callback: (response) => {
-          console.log("Google Identity Services response: ", response.credential);
-          loadGoogleCalendarApi();
-        },
-      });
-      window.google.accounts.id.renderButton(
-        document.getElementById("signInDiv"),
-        { theme: "outline", size: "large" }
-      );
-    };
+    // window.onGoogleLibraryLoad = () => {
+    //   window.google.accounts.id.initialize({
+    //     client_id: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
+    //     callback: (response) => {
+    //       console.log("Google Identity Services response: ", response.credential);
+    //       loadGoogleCalendarApi();
+    //     },
+    //   });
+    //   window.google.accounts.id.renderButton(
+    //     document.getElementById("signInDiv"),
+    //     { theme: "outline", size: "large" }
+    //   );
+    // };
   }, []);
 
-  const loadGoogleCalendarApi = () => {
-    gapi.load('client', () => {
-      gapi.client.init({
-        apiKey: "AIzaSyBPOlC2HGjUf9DyISHD25aDr9gNuNRUkZA",
-        clientId: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
-        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-        scope: "https://www.googleapis.com/auth/calendar"
-      }).then(() => {
-        // The API is initialized and the user is signed in.
-        setGoogleUser(gapi.auth2.getAuthInstance().currentUser.get());
-      }, (error) => {
-        console.error("Error loading GAPI client for API", error);
-      });
-    });
-  };
+  // const loadGoogleCalendarApi = () => {
+  //   gapi.load('client', () => {
+  //     gapi.client.init({
+  //       apiKey: "AIzaSyBPOlC2HGjUf9DyISHD25aDr9gNuNRUkZA",
+  //       clientId: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
+  //       discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+  //       scope: "https://www.googleapis.com/auth/calendar",
+  //       plugin: "austin-public-library"
+  //     }).then(() => {
+  //       // The API is initialized and the user is signed in.
+  //       console.log("Correctly initialized with proper scope");
+  //       setGoogleUser(gapi.auth2.getAuthInstance().currentUser.get());
+  //     }, (error) => {
+  //       console.error("Error loading GAPI client for API", error);
+  //     });
+  //   });
+  // };
 
-  const handleAddToCalendarClick = async () => {
-    if (!googleUser) {
-      window.google.accounts.id.prompt((notification) => {
-        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-          console.log("Sign-in prompt was not displayed or was skipped.");
-        } else if (notification.isDismissedMoment()) {
-          console.log("User dismissed the sign-in prompt.");
-        }
-      });
-    } else {
-      // User is signed in; proceed with adding the event to Google Calendar
-      addEventToCalendar();
-    }
-  };
+  // const handleAddToCalendarClick = async () => {
+  //   if (!googleUser) {
+  //     window.google.accounts.id.prompt((notification) => {
+  //       if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+  //         console.log("Sign-in prompt was not displayed or was skipped.");
+  //       } else if (notification.isDismissedMoment()) {
+  //         console.log("User dismissed the sign-in prompt.");
+  //       }
+  //     });
+  //   } else {
+  //     // User is signed in; proceed with adding the event to Google Calendar
+  //     addEventToCalendar();
+  //   }
+  // };
 
   const addEventToCalendar = () => {
     if (!googleUser) {
