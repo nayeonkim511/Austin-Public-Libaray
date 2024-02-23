@@ -47,61 +47,72 @@ const SearchResultsModal = ({ results, show, onClose }) => {
 
 const EventModal = ({ show, onClose, event }) => {
   const [googleUser, setGoogleUser] = useState(null);
-  
+  const [accessToken, setAccessToken] = useState(null);
+
+  // Initialize Google Identity Services
   useEffect(() => {
-    // window.onGoogleLibraryLoad = () => {
-    //   window.google.accounts.id.initialize({
-    //     client_id: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
-    //     callback: (response) => {
-    //       console.log("Google Identity Services response: ", response.credential);
-    //       loadGoogleCalendarApi();
-    //     },
-    //   });
-    //   window.google.accounts.id.renderButton(
-    //     document.getElementById("signInDiv"),
-    //     { theme: "outline", size: "large" }
-    //   );
-    // };
+    window.onGoogleLibraryLoad = () => {
+      window.google.accounts.id.initialize({
+        client_id: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
+        callback: (response) => {
+          console.log("Google Identity Services response: ", response.credential);
+          loadGoogleCalendarApi();
+        },
+      });
+      window.google.accounts.id.renderButton(
+        document.getElementById("signInDiv"),
+        { theme: "outline", size: "large" }
+      );
+    };
   }, []);
 
-  // const loadGoogleCalendarApi = () => {
-  //   gapi.load('client', () => {
-  //     gapi.client.init({
-  //       apiKey: "AIzaSyBPOlC2HGjUf9DyISHD25aDr9gNuNRUkZA",
-  //       clientId: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
-  //       discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
-  //       scope: "https://www.googleapis.com/auth/calendar",
-  //       plugin: "austin-public-library"
-  //     }).then(() => {
-  //       // The API is initialized and the user is signed in.
-  //       console.log("Correctly initialized with proper scope");
-  //       setGoogleUser(gapi.auth2.getAuthInstance().currentUser.get());
-  //     }, (error) => {
-  //       console.error("Error loading GAPI client for API", error);
-  //     });
-  //   });
-  // };
+  const client = window.google.accounts.oauth2.initTokenClient({
+    client_id: '765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com',
+    scope: 'https://www.googleapis.com/auth/calendar',
+    callback: (tokenResponse) => {
+      console.log("Token response: ", tokenResponse);
+      setAccessToken(tokenResponse.access_token);
+    }
+  });
 
-  // const handleAddToCalendarClick = async () => {
-  //   if (!googleUser) {
-  //     window.google.accounts.id.prompt((notification) => {
-  //       if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-  //         console.log("Sign-in prompt was not displayed or was skipped.");
-  //       } else if (notification.isDismissedMoment()) {
-  //         console.log("User dismissed the sign-in prompt.");
-  //       }
-  //     });
-  //   } else {
-  //     // User is signed in; proceed with adding the event to Google Calendar
-  //     addEventToCalendar();
-  //   }
-  // };
+  const loadGoogleCalendarApi = () => {
+    gapi.load('client:auth2', () => {
+      gapi.client.init({
+        apiKey: "AIzaSyBPOlC2HGjUf9DyISHD25aDr9gNuNRUkZA",
+        clientId: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
+        discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+        scope: "https://www.googleapis.com/auth/calendar"
+      }).then(() => {
+        // The API is initialized and the user is signed in.
+        setGoogleUser(true);
+      }, (error) => {
+        console.error("Error loading GAPI client for API", error);
+      });
+    });
+  };
+
+  const handleAddToCalendarClick = async () => {
+    if (!googleUser) {
+      window.google.accounts.id.prompt((notification) => {
+        if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+          console.log("Sign-in prompt was not displayed or was skipped.");
+        } else if (notification.isDismissedMoment()) {
+          console.log("User dismissed the sign-in prompt.");
+        }
+      });
+    } else {
+      // User is signed in; proceed with adding the event to Google Calendar
+      addEventToCalendar();
+    }
+  };
 
   const addEventToCalendar = () => {
     if (!googleUser) {
       console.log("User is not signed in.");
       return;
     }
+
+    console.log("User info: " + gapi.auth2.getAuthInstance().currentUser.get().getAuthResponse().access_token);
 
     const eventToAdd = {
       'summary': event.title,
@@ -117,15 +128,30 @@ const EventModal = ({ show, onClose, event }) => {
       },
     };
 
-    var request = gapi.client.calendar.events.insert({
-      'calendarId': 'primary',
-      'resource': eventToAdd,
-    });
+    function initiate() {
+      gapi.client
+      .request({
+        path: `https://www.googleapis.com/calendar/v3/calendars/primary/events`,
+        method: "POST",
+        body: eventToAdd,
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+      .then(
+        (response) => {
+          return [true, response];
+        },
+        function (err) {
+          console.log(err);
+          return [false, err];
+        }
+      );
+    }
 
-    request.execute((event) => {
-      console.log('Event created: ', event.htmlLink);
-      onClose(); // Close the modal
-    });
+    gapi.load("client", initiate);
+    
   };
 
   if (!show) return null;
@@ -137,6 +163,7 @@ const EventModal = ({ show, onClose, event }) => {
         <h2>{event?.title}</h2>
         <p>{event?.description}</p>
         <div id="signInDiv"></div> {/* Google Sign-in button */}
+        <button onClick={client.requestAccessToken()}>Authorize me</button>
         <button onClick={handleAddToCalendarClick}>Add to Calendar</button>
         <button onClick={onClose}>Close</button>
       </div>
