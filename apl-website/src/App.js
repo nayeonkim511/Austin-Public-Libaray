@@ -46,38 +46,89 @@ const SearchResultsModal = ({ results, show, onClose }) => {
 };
 
 const EventModal = ({ show, onClose, event }) => {
+  const [userSignedIn, setUserSignedIn] = useState(false); // State to track if the user is signed in
+
+  useEffect(() => {
+    window.google.accounts.id.initialize({
+      client_id: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
+      callback: handleCredentialResponse,
+    });
+    // Optionally, auto-render the button if you plan to show it immediately
+    if (document.getElementById("googleSignInButton")) {
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleSignInButton"),
+        { theme: "outline", size: "large" }
+      );
+    }
+  }, []);
+
+  const handleCredentialResponse = (response) => {
+    console.log("Encoded JWT ID token: " + response.credential);
+    setUserSignedIn(true); // Update state to reflect the user is signed in
+    // Optionally, send this token to your backend for verification and further processing
+  };
+
+  const handleAddToCalendarClick = async () => {
+    if (!userSignedIn) {
+      // If the user is not signed in, prompt the sign-in process
+      console.log("User not signed in.")
+      window.google.accounts.id.prompt(); // This can be used to prompt the user to sign in if not already
+      setUserSignedIn(true); // Update state to reflect the user is signed in (for testing purposes only, remove in production
+    } else {
+      // Assuming the user is signed in and you have the necessary access tokens
+      try {
+        const eventToAdd = {
+          'summary': event.title,
+          'location': event.location,
+          'description': 'Added from Library Events App',
+          'start': {
+            'dateTime': event.start.toISOString(),
+            'timeZone': 'America/Los_Angeles',
+          },
+          'end': {
+            'dateTime': event.end.toISOString(),
+            'timeZone': 'America/Los_Angeles',
+          },
+          'reminders': {
+            'useDefault': false,
+            'overrides': [
+              { 'method': 'email', 'minutes': 24 * 60 },
+              { 'method': 'popup', 'minutes': 10 },
+            ],
+          },
+        };
+
+        const request = window.gapi.client.calendar.events.insert({
+          'calendarId': 'primary',
+          'resource': eventToAdd,
+        });
+
+        request.execute((resp) => {
+          console.log('Resp: ' + resp.htmlLink);
+          onClose(); // Close the modal or notify the user
+        });
+      } catch (error) {
+        console.error("Error adding event to Google Calendar:", error);
+      }
+    }
+  };
+
   if (!show || !event) return null;
 
   return (
     <div className="modal-backdrop">
       <div className="modal">
-        <h2>{event.title}</h2>
-        <p>Time: {moment(event.start).format('LT')} - {moment(event.end).format('LT')}</p>
-        
-        {/* Location */}
-        <p>Location: {event.location}</p>
-
-        {/* Event Description */}
-        <div className="event-description">
-          <h3>Description</h3>
-          {/* <p>{event.desc}</p> */}
-        </div>
-
-        {/* Event Image (if applicable) */}
-        {/* <img src={event.imageUrl} alt="Event" /> */}
-
+        {/* Existing modal content */}
         <div className="modal-buttons">
-          <button onClick={() => {}}><i className="fas fa-share-alt"></i> Share</button>
-          <button onClick={() => {}}><i className="fas fa-sms"></i> Text</button>
-          <button onClick={() => {}}><i className="fas fa-print"></i> Print</button>
+          {/* Adjusted to directly add event to calendar or prompt sign in */}
+          <button onClick={handleAddToCalendarClick}>Add to Calendar</button>
         </div>
-
+        { !userSignedIn && <div id="googleSignInButton"></div> } {/* Render sign-in button if user not signed in */}
         <button onClick={onClose}>Close</button>
       </div>
     </div>
   );
 };
-
 
 function App() {
   const [events] = useState(Records.apl_event);
@@ -93,6 +144,65 @@ function App() {
   const [locationOpen, setLocationOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
+  // Initialize the GAPI client and sign-in button
+  useEffect(() => {
+    const loadGapiAndSignIn = () => {
+      // Check if the gapi script is already loaded to avoid double-loading it
+      if (window.gapi) {
+        initializeGapiAndSignIn();
+        return;
+      }
+  
+      const script = document.createElement('script');
+      script.src = 'https://apis.google.com/js/api.js';
+      script.onload = () => {
+        console.log('GAPI script loaded successfully.');
+        initializeGapiAndSignIn();
+      };
+      script.onerror = (error) => {
+        console.error('Failed to load GAPI script:', error);
+      };
+      document.body.appendChild(script);
+    };
+  
+    const initializeGapiAndSignIn = () => {
+      window.gapi.load('client:auth2', () => {
+        window.gapi.client.init({
+          apiKey: 'AIzaSyBPOlC2HGjUf9DyISHD25aDr9gNuNRUkZA', // Use your actual API key
+          clientId: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
+          discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
+          scope: 'https://www.googleapis.com/auth/calendar',
+          plugin_name: 'austin-public-library'
+        }).then(() => {
+          console.log("GAPI client initialized for Google Calendar.");
+          // Proceed to initialize Google Identity Services sign-in
+          initializeGoogleSignIn();
+        }).catch(e => {
+          console.error("Error initializing GAPI client:", e);
+        });
+      });
+    };
+  
+    const initializeGoogleSignIn = () => {
+      window.google.accounts.id.initialize({
+        client_id: "765004802194-fcjsvjjvtpdesed8n6f1ckrmc0julofj.apps.googleusercontent.com",
+        callback: handleCredentialResponse,
+      });
+      window.google.accounts.id.renderButton(
+        document.getElementById("googleSignInButton"),
+        { theme: "outline", size: "large" }  // Customization attributes
+      );
+    };
+  
+    loadGapiAndSignIn();
+  }, []);
+  
+  const handleCredentialResponse = (response) => {
+    console.log("Encoded JWT ID token: " + response.credential);
+    // Implement your logic to handle the sign-in response
+  };
+  
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
