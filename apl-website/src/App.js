@@ -243,7 +243,10 @@ function App() {
             eventPropGetter={eventStyleGetter}
             components={{
               event: (props) => (
-                <CustomEvent {...props} onClick={handleEventClick} />
+                <CustomEvent
+                  {...props}
+                  onClick={handleEventClick}
+                />
               ),
             }}
             formats={{

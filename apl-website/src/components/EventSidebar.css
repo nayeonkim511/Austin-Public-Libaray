@@ -1,0 +1,11 @@
+.hover-sidebar {
+  border-radius: 0px;
+  position: fixed;
+  right: 0px;
+  height: 100vh;
+  top: -1px;
+  border: 1.5px solid black;
+  width: 300px;
+  background-color: white;
+  z-index: 999999;
+}
