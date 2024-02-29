@@ -4,6 +4,7 @@ body {
 
 .rbc-calendar {
   font-family: "Inter";
+  z-index: 0;
 }
 
 .App {
@@ -20,7 +21,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; 
+  z-index: 1000;
 }
 
 .modal {
@@ -121,7 +122,7 @@ body {
 }
 
 .search-container {
-  width: 100%; 
+  width: 100%;
   padding: 10px;
 }
 
@@ -136,7 +137,7 @@ body {
   left: 0;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 10; 
+  z-index: 10;
 }
 
 .search-results-content {
@@ -146,44 +147,74 @@ body {
   overflow-y: auto;
 }
 
-  .search-result-item {
+.search-result-item {
   margin: 5px;
   padding: 10px;
   border-bottom: 1px solid #ddd;
-  }
+}
 
-  .checkbox {
-    background: linear-gradient(to right, #ed0e0e 5%,#ed0e0e 5%,#ed0e0e 5%,white 5%,white 100%);
-    border-radius: 7px;
-    width: 250px;
-    border: 1.5px solid rgb(143, 143, 143);
-    height: 15px;
-    padding: 10px;
-    margin: 20px;
-  }
+.checkbox {
+  background: linear-gradient(
+    to right,
+    #ed0e0e 5%,
+    #ed0e0e 5%,
+    #ed0e0e 5%,
+    white 5%,
+    white 100%
+  );
+  border-radius: 7px;
+  width: 250px;
+  border: 1.5px solid rgb(143, 143, 143);
+  height: 15px;
+  padding: 10px;
+  margin: 20px;
+}
 
-  .font {
+.font {
   font-family: "Inter";
-  }
+}
 
-  .colorbar {
-    height: 100px;
-    width: 7px;
-    background-color: #ed0e0e;
-    border-radius: 20px;
-  }
+.colorbar {
+  height: 100px;
+  width: 7px;
+  background-color: #ed0e0e;
+  border-radius: 20px;
+  z-index: 0;
+}
 
-  .container {
-    display: flex;
-    flex-direction: row;
-  }
+.container {
+  display: flex;
+  flex-direction: row;
+  z-index: 0;
+}
 
-  .colorlabel {
-    padding-left: 10px;
-    width: 120px;
-    font-size: 14px;
-  }
+.colorlabel {
+  padding-left: 10px;
+  width: 120px;
+  font-size: 14px;
+  z-index: 0;
+}
 
-  .customheader {
-    font-size: 6px;
-  }
+.customheader {
+  font-size: 6px;
+}
+
+.rbc-calendar {
+  z-index: 0;
+}
+
+.rbc-event {
+  z-index: 0;
+}
+
+.rbc-event.rbc-event-allday {
+  z-index: 0;
+}
+
+.colorlabel {
+  z-index: 0;
+}
+
+.rbc-date-cell {
+  z-index: 0;
+}

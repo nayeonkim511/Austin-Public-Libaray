@@ -88,7 +88,7 @@ function App() {
     }
     setSelectedLocations(newLocations);
     setShowAllEvents(newLocations.size === 0);
-  }
+  };
 
   const filteredEvents = useMemo(() => {
     if (showAllEvents) return events;
@@ -105,7 +105,13 @@ function App() {
         selectedLocations.has(event.field_event_loc);
       return ageMatch && categoryMatch && locationMatch;
     });
-  }, [events, showAllEvents, selectedAges, selectedCategories, selectedLocations]);
+  }, [
+    events,
+    showAllEvents,
+    selectedAges,
+    selectedCategories,
+    selectedLocations,
+  ]);
 
   const convertedEvents = filteredEvents.map((event) => ({
     id: event.nid,
@@ -243,10 +249,7 @@ function App() {
             eventPropGetter={eventStyleGetter}
             components={{
               event: (props) => (
-                <CustomEvent
-                  {...props}
-                  onClick={handleEventClick}
-                />
+                <CustomEvent {...props} onClick={handleEventClick} />
               ),
             }}
             formats={{

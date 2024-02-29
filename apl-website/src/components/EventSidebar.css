@@ -6,6 +6,40 @@
   top: -1px;
   border: 1.5px solid black;
   width: 300px;
-  background-color: white;
-  z-index: 999999;
+  background-color: white !important;
+  z-index: 2147483647;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding-top: 20px;
+}
+
+.date {
+  padding-left: 30px;
+}
+
+.description-container {
+  padding-left: 40px;
+  width: 700px;
+  text-wrap: wrap;
+  text-align: left;
+  font-size: 17px;
+}
+
+.modal-title-container {
+  width: 150px;
+  text-wrap: wrap;
+  text-align: left;
+  font-size: 17px;
+  padding-left: 20px;
+}
+
+.button1 {
+  padding-left: 20px;
+  padding-top: 0px;
+}
+
+.button2 {
+  padding-left: 10px;
+  padding-top: 0px;
 }
