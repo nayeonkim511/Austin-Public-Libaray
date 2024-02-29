@@ -102,7 +102,7 @@ function App() {
     }
     setSelectedLocations(newLocations);
     setShowAllEvents(newLocations.size === 0);
-  }
+  };
 
   const filteredEvents = useMemo(() => {
     if (showAllEvents) return events;
@@ -119,7 +119,13 @@ function App() {
         selectedLocations.has(event.field_event_loc);
       return ageMatch && categoryMatch && locationMatch;
     });
-  }, [events, showAllEvents, selectedAges, selectedCategories, selectedLocations]);
+  }, [
+    events,
+    showAllEvents,
+    selectedAges,
+    selectedCategories,
+    selectedLocations,
+  ]);
 
   const convertedEvents = filteredEvents.map((event) => ({
     id: event.nid,
@@ -180,14 +186,19 @@ function App() {
               All Events
             </button>
             {allEventsOpen && (
-              <div className="checkbox">
-                <input
+              <div>
+                {/* <input
                   type="checkbox"
                   id="all-events"
                   checked={showAllEvents}
                   onChange={handleAllEventsChange}
                 />
-                <label htmlFor="all-events"> Show All</label>
+                <label htmlFor="all-events"> Show All</label> */}
+                <ColorCheckbox
+                  id={`all-events`}
+                  checked={showAllEvents}
+                  onChange={handleAllEventsChange}
+                />
               </div>
             )}
           </div>
@@ -195,14 +206,19 @@ function App() {
             <button onClick={() => setAgeOpen(!ageOpen)}>Filter by Age</button>
             {ageOpen &&
               uniqueAges.map((age) => (
-                <div key={age} className="checkbox">
-                  <input
+                <div key={age}>
+                  {/* <input
                     type="checkbox"
                     id={`age-${age}`}
                     checked={selectedAges.has(age)}
                     onChange={() => handleAgeChange(age)}
                   />
-                  <label htmlFor={`age-${age}`}>{age}</label>
+                  <label htmlFor={`age-${age}`}>{age}</label> */}
+                  <ColorCheckbox
+                    id={`age-${age}`}
+                    checked={selectedCategories.has(age)}
+                    onChange={() => handleAgeChange(age)}
+                  />
                 </div>
               ))}
           </div>
@@ -212,14 +228,19 @@ function App() {
             </button>
             {categoryOpen &&
               uniqueCategories.map((category) => (
-                <div key={category} className="checkbox">
-                  <input
+                <div key={category}>
+                  {/* <input
                     type="checkbox"
                     id={`category-${category}`}
                     checked={selectedCategories.has(category)}
                     onChange={() => handleCategoryChange(category)}
                   />
-                  <label htmlFor={`category-${category}`}>{category}</label>
+                  <label htmlFor={`category-${category}`}>{category}</label> */}
+                  <ColorCheckbox
+                    id={`category-${category}`}
+                    checked={selectedCategories.has(category)}
+                    onChange={() => handleLocationChange(category)}
+                  />
                 </div>
               ))}
           </div>
@@ -258,7 +279,11 @@ function App() {
             eventPropGetter={eventStyleGetter}
             components={{
               event: (props) => (
-                <CustomEvent {...props} onClick={handleEventClick} />
+                <CustomEvent
+                  {...props}
+                  onClick={handleEventClick}
+                  style={{ zIndex: 0 }}
+                />
               ),
             }}
             formats={{
@@ -272,6 +297,7 @@ function App() {
                 </span>
               </div>
             )}
+            style={{ zIndex: 0 }}
           />
           <EventModal
             show={modalVisible}
