@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import "./App.css";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import Records from "./event_json_files/apl_events.json";
@@ -10,6 +10,8 @@ import ColorCheckbox from "./components/ColorCheckbox.js";
 import CustomEvent from "./components/CustomEvent";
 import SearchResultsModal from "./components/SearchResultsModal";
 import EventModal from "./components/EventModal";
+import Papa from 'papaparse';
+import eventsCsv from './mappings/event-categories.csv';
 
 const localizer = momentLocalizer(moment);
 
@@ -27,6 +29,9 @@ function App() {
   const [locationOpen, setLocationOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+  
+  const csvRef = useRef(null);
+
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
@@ -45,7 +50,16 @@ function App() {
     return Array.from(ages);
   }, [events]);
 
-  const uniqueCategories = useMemo(() => {
+  const uniqueCategories = useMemo(async () => {
+    if (csvRef.current === null) {
+      const result = await fetch(eventsCsv);
+      const text = await result.text();
+
+      const parsedCSV = Papa.parse(text).data;
+
+      csvRef.current = parsedCSV;
+    }
+
     const categories = new Set(events.map((event) => event.event_category));
     return Array.from(categories);
   }, [events]);
@@ -110,6 +124,7 @@ function App() {
   const convertedEvents = filteredEvents.map((event) => ({
     id: event.nid,
     title: event.title,
+    category: event.event_category,
     start: new Date(parseInt(event.field_slr_time_start) * 1000),
     end: new Date(parseInt(event.field_slr_time_end) * 1000),
     desc: event.body,
