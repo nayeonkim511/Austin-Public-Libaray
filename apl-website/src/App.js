@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import "./App.css";
 import { Calendar, momentLocalizer } from "react-big-calendar";
-import Records from "./event_json_files/apl_events.json";
+// import Records from "./event_json_files/apl_events.json";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "@fontsource/inter";
@@ -11,10 +11,13 @@ import CustomEvent from "./components/CustomEvent";
 import SearchResultsModal from "./components/SearchResultsModal";
 import EventModal from "./components/EventModal";
 
+
+// moment.tz.setDefault('America/Chicago')
+
 const localizer = momentLocalizer(moment);
 
 function App() {
-  const [events] = useState(Records.apl_event);
+  const [events, setEvents] = useState(null);
   const [selectedAges, setSelectedAges] = useState(new Set());
   const [selectedCategories, setSelectedCategories] = useState(new Set());
   const [selectedLocations, setSelectedLocations] = useState(new Set());
@@ -28,6 +31,8 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
+  
+
   const handleEventClick = (event) => {
     setSelectedEvent(event);
     setModalVisible(true);
@@ -39,6 +44,9 @@ function App() {
   };
 
   const uniqueAges = useMemo(() => {
+    if (events === null) {
+      return []; // or whatever default value you prefer
+    }
     const ages = new Set(
       events.map((event) => event.field_event_recommended_ages)
     );
@@ -46,6 +54,9 @@ function App() {
   }, [events]);
 
   const uniqueCategories = useMemo(() => {
+    if (events === null) {
+      return []; // or whatever default value you prefer
+    }
     const categories = new Set(events.map((event) => event.event_category));
     return Array.from(categories);
   }, [events]);
@@ -91,6 +102,9 @@ function App() {
   }
 
   const filteredEvents = useMemo(() => {
+    if (events === null) {
+      return []; // or whatever default value you prefer
+    }
     if (showAllEvents) return events;
 
     return events.filter((event) => {
@@ -107,15 +121,45 @@ function App() {
     });
   }, [events, showAllEvents, selectedAges, selectedCategories, selectedLocations]);
 
-  const convertedEvents = filteredEvents.map((event) => ({
-    id: event.nid,
-    title: event.title,
-    start: new Date(parseInt(event.field_slr_time_start) * 1000),
-    end: new Date(parseInt(event.field_slr_time_end) * 1000),
-    desc: event.body,
-    location: event.field_event_loc,
-    allDay: true,
-  }));
+  // console.log(events);
+  // console.log(filteredEvents);
+
+  const convertedEvents = filteredEvents.map((event) => {
+    // Convert Unix timestamp to milliseconds
+    const startTimeStamp = new Date(event.field_slr_time_start);
+    const endTimeStamp = new Date(event.field_slr_time_end);
+  
+    // Calculate the differences between event times and current time in milliseconds
+    
+    return {
+      id: event.nid,
+      title: event.title,
+      start: new Date(startTimeStamp),
+      end: new Date(endTimeStamp),
+      desc: event.body,
+      location: event.field_event_loc,
+      allDay: false,
+    };
+  });
+  console.log("Converted Events ", convertedEvents);
+  
+  useEffect(() => {
+    async function fetchData() {
+    try {
+      const response = await fetch("https://dev-apl-cms.pantheonsite.io/api/events");
+
+      const json = await response.json();
+      setEvents(json);
+    }
+    catch (error) {
+      console.log(error);
+    }
+    }
+    fetchData();
+  }, []);
+
+  console.log("Events ", events);
+
 
   useEffect(() => {
     if (searchQuery.length > 0) {
@@ -144,7 +188,9 @@ function App() {
       style,
     };
   };
-
+  while (events === null) {
+    return <div>Loading...</div>;
+  }
   return (
     <div className="App">
       <div className="main-container">
@@ -234,21 +280,20 @@ function App() {
               ))}
           </div>
         </div>
+        { convertedEvents.length !== 0 &&
         <div className="calendar-container">
           <Calendar
             localizer={localizer}
             events={convertedEvents}
             startAccessor="start"
             endAccessor="end"
+            showMultiDayTimes
+            step={60}
             eventPropGetter={eventStyleGetter}
             components={{
               event: (props) => (
                 <CustomEvent {...props} onClick={handleEventClick} />
               ),
-            }}
-            formats={{
-              eventTimeRangeFormat: ({ start, end }) =>
-                `${moment(start).format("LT")} - ${moment(end).format("LT")}`,
             }}
             toolbar={(toolbar) => (
               <div>
@@ -269,6 +314,7 @@ function App() {
             onClose={() => setSearchResults([])}
           />
         </div>
+        }
       </div>
     </div>
   );
