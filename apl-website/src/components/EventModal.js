@@ -93,9 +93,6 @@ const EventModal = ({ show, onClose, event }) => {
           >
             Get Notified
           </Button>
-
-          
-
           
         </div>
         <h2>Description: </h2>
