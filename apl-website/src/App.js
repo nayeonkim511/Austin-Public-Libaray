@@ -201,7 +201,7 @@ function App() {
                   <label htmlFor={`age-${age}`}>{age}</label> */}
                   <ColorCheckbox
                     id={`age-${age}`}
-                    checked={selectedCategories.has(age)}
+                    checked={selectedAges.has(age)}
                     onChange={() => handleAgeChange(age)}
                   />
                 </div>
