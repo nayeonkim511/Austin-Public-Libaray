@@ -16,6 +16,17 @@ import EventModal from "./components/EventModal";
 
 const localizer = momentLocalizer(moment);
 
+const eventPropGetter = (event) => {
+  const backgroundColor = '#' + event.hexColor;
+  return {
+    className: 'event-dot',
+    style: {
+      backgroundColor: backgroundColor,
+      display: 'inline-block !important',
+    },
+  };
+};
+
 function App() {
   const [events, setEvents] = useState(null);
   const [selectedAges, setSelectedAges] = useState(new Set());
@@ -178,22 +189,53 @@ function App() {
     }
   }, [searchQuery, events]);
 
-  const eventStyleGetter = (event, start, end, isSelected) => {
-    const style = {
-      backgroundColor: "#E8E8E8",
-      borderRadius: "5px",
-      opacity: 1,
-      color: "black",
-      border: "1px solid #E8E8E8",
-      display: "block",
-      cursor: "pointer",
-      margin: "0 0 5px 0",
+  const eventStyleGetter = (event) => {
+    // const backgroundColor = '#' + event.hexColor;
+    let style = {
+      className: 'event-dot',
+      style: {
+        backgroundColor: "#E8E8E8",
+        borderRadius: "5px",
+        opacity: 1,
+        color: "black",
+        border: "1px solid #E8E8E8",
+        cursor: "pointer",
+        margin: "0 0 5px 0",
+        position: "relative",
+        display: 'inline-block !important',
+      },
     };
-
-    return {
-      style,
-    };
+  
+    // Adjust height based on the view
+    if (localizer.view === 'day') {
+      // For day view, set larger height
+      style.style.height = '35px'; // Adjust this value as needed
+    } else {
+      // For other views, set default height
+      style.style.height = '25px'; // Adjust this value as needed
+    }
+  
+    return style;
   };
+
+  // => {
+  //   return {
+  //     className: 'event-dot',
+      // style: {
+      // backgroundColor: "#E8E8E8",
+      // borderRadius: "5px",
+      // opacity: 1,
+      // color: "black",
+      // border: "1px solid #E8E8E8",
+      // display: 'inline-block !important',
+      // cursor: "pointer",
+      // margin: "0 0 5px 0",
+      // position: "relative",
+      // display: "flex !important",
+  //     },
+  //   };
+  // };
+  
   while (events === null) {
     return <div>Loading...</div>;
   }
@@ -328,6 +370,7 @@ function App() {
               </div>
             )}
             style={{ zIndex: 0 }}
+            
           />
           <EventModal
             show={modalVisible}

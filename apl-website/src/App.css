@@ -218,3 +218,29 @@ body {
 .rbc-date-cell {
   z-index: 0;
 }
+
+
+.event-dot {
+  position: relative;
+  display: flex !important;
+  display: inline-block;
+  /* width: 10px !important; */
+  /* height: 25px !important; */
+  /* border-radius: 50%; */
+  margin: 1.4px 0 0.4px 5px !important;
+}
+
+
+/* .rbc-row-content .rbc-row:nth-child(n + 3) { display: none; }  */
+
+
+.rbc-header {
+  background: #037ffc;
+  color: white !important;
+  padding: 3px !important;
+  font-size: 20px !important;
+  font-weight: bold;
+  height: 30px;
+  text-align: center;
+  font-weight: 300 !important;
+}

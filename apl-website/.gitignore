@@ -5,6 +5,8 @@
 /.pnp
 .pnp.js
 
+../apl2023/
+
 # testing
 /coverage
 
