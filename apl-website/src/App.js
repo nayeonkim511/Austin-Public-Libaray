@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import "./App.css";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import Records from "./event_json_files/apl_events.json";
@@ -10,8 +10,9 @@ import ColorCheckbox from "./components/ColorCheckbox.js";
 import CustomEvent from "./components/CustomEvent";
 import SearchResultsModal from "./components/SearchResultsModal";
 import EventModal from "./components/EventModal";
-import Papa from 'papaparse';
-import eventsCsv from './mappings/event-categories.csv';
+
+import categoryData from './mappings/event-categories.json';
+import locationData from './mappings/event-locations.json';
 
 const localizer = momentLocalizer(moment);
 
@@ -28,10 +29,10 @@ function App() {
   const [categoryOpen, setCategoryOpen] = useState(false);
   const [locationOpen, setLocationOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  
-  const csvRef = useRef(null);
+  const [searchResults, setSearchResults] = useState([]); 
 
+  const [uniqueCategories, setUniqueCategories] = useState([]);
+  const [uniqueLocations, setUniqueLocations] = useState([]);
 
   const handleEventClick = (event) => {
     setSelectedEvent(event);
@@ -50,18 +51,33 @@ function App() {
     return Array.from(ages);
   }, [events]);
 
-  const uniqueCategories = useMemo(async () => {
-    if (csvRef.current === null) {
-      const result = await fetch(eventsCsv);
-      const text = await result.text();
+  useEffect(() => {
 
-      const parsedCSV = Papa.parse(text).data;
+    const updateCategories = async () => {
+      const categoryMap = categoryData.reduce((acc, { id, name }) => {
+        acc[id] = name;
+        return acc;
+      }, {});
 
-      csvRef.current = parsedCSV;
-    }
+      const categories = events.map(event => categoryMap[event.event_category] || event.event_category);
+      const uniqueCategorySet = new Set(categories);
+      setUniqueCategories([...uniqueCategorySet]);
+    };
 
-    const categories = new Set(events.map((event) => event.event_category));
-    return Array.from(categories);
+    const updateLocations = () => {
+      const locationIdNameMap = locationData.reduce((acc, { id, name }) => {
+        acc[id] = name;
+        return acc;
+      }, {});
+  
+      const locations = events.map(event => locationIdNameMap[event.field_event_loc] || event.field_event_loc);
+      const uniqueLocationSet = new Set(locations);
+      setUniqueLocations([...uniqueLocationSet]);
+    };
+
+    updateCategories();
+    updateLocations();
+
   }, [events]);
 
   const handleAllEventsChange = () => {
@@ -130,7 +146,6 @@ function App() {
   const convertedEvents = filteredEvents.map((event) => ({
     id: event.nid,
     title: event.title,
-    category: event.event_category,
     start: new Date(parseInt(event.field_slr_time_start) * 1000),
     end: new Date(parseInt(event.field_slr_time_end) * 1000),
     desc: event.body,
@@ -187,13 +202,13 @@ function App() {
             </button>
             {allEventsOpen && (
               <div>
-                {/* <input
+                <input
                   type="checkbox"
                   id="all-events"
                   checked={showAllEvents}
                   onChange={handleAllEventsChange}
                 />
-                <label htmlFor="all-events"> Show All</label> */}
+                <label htmlFor="all-events"> Show All</label>
                 <ColorCheckbox
                   id={`all-events`}
                   checked={showAllEvents}
@@ -215,7 +230,7 @@ function App() {
                   />
                   <label htmlFor={`age-${age}`}>{age}</label> */}
                   <ColorCheckbox
-                    id={`age-${age}`}
+                    id={`${age}`}
                     checked={selectedCategories.has(age)}
                     onChange={() => handleAgeChange(age)}
                   />
@@ -234,12 +249,12 @@ function App() {
                     id={`category-${category}`}
                     checked={selectedCategories.has(category)}
                     onChange={() => handleCategoryChange(category)}
-                  />
-                  <label htmlFor={`category-${category}`}>{category}</label> */}
+                  /> */}
+                  {/* <label htmlFor={`${category}`}>{category}</label> */}
                   <ColorCheckbox
-                    id={`category-${category}`}
+                    id={`${category}`}
                     checked={selectedCategories.has(category)}
-                    onChange={() => handleLocationChange(category)}
+                    onChange={() => handleCategoryChange(category)}
                   />
                 </div>
               ))}
@@ -249,15 +264,15 @@ function App() {
               Filter by Location
             </button>
             {locationOpen &&
-              uniqueCategories.map((location) => (
+              uniqueLocations.map((location) => ( //USE uniqueLocations.map instead!
                 <div key={location}>
                   {
-                    /* <input
-                    type="checkbox"
-                    id={`category-${location}`}
-                    checked={selectedCategories.has(location)}
-                    onChange={() => handleLocationChange(location)}
-                  /> */
+                  //   /* <input
+                  //   type="checkbox"
+                  //   id={`category-${location}`}
+                  //   checked={selectedCategories.has(location)}
+                  //   onChange={() => handleLocationChange(location)}
+                  // /> 
                     <ColorCheckbox
                       id={`${location}`}
                       checked={selectedCategories.has(location)}
