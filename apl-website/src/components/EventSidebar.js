@@ -30,7 +30,8 @@ const EventSidebar = () => {
   const { setIsClicked, setModalEvent } = useModalContext();
   if(thisEvent != null) {
   const temp = thisEvent;
-  const parsed = parse(thisEvent.desc);
+  console.log(thisEvent);
+  const parsed = thisEvent.desc === false ? null : parse(thisEvent.desc);
     return (
       <div>
           <div
@@ -92,6 +93,7 @@ const EventSidebar = () => {
               {parsed}
             </div>
           </div>
+          
       </div>
     );
 }
