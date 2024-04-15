@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useMemo } from "react";
-import "./App.css";
+import "./App.scss";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 // import Records from "./event_json_files/apl_events.json";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "@fontsource/inter";
 import ColorCheckbox from "./components/ColorCheckbox.js";
-
+import EventSidebar from "./components/EventSidebar.js";
 import CustomEvent from "./components/CustomEvent";
 import SearchResultsModal from "./components/SearchResultsModal";
 import EventModal from "./components/EventModal";
-
-
-// moment.tz.setDefault('America/Chicago')
+import { PanelContextProvider } from "./components/PanelContext.js";
+import { EventContextProvider } from "./components/EventContext.js";
+import {
+  ModalContextProvider,
+  useModalContext,
+} from "./components/ModalContext.js";
 
 const localizer = momentLocalizer(moment);
 
@@ -241,102 +244,107 @@ function App() {
   }
   return (
     <div className="App">
-      <div className="main-container">
-        <div className="filters-sidebar">
-          <div>
-            <b>FILTERS</b>
-          </div>
-          <div className="search-container">
-            <input
-              type="text"
-              placeholder="Search events..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          <div className="filter-dropdown">
-            <button onClick={() => setAllEventsOpen(!allEventsOpen)}>
-              All Events
-            </button>
-            {allEventsOpen && (
-              <div>
-                {/* <input
+      <EventContextProvider>
+        <PanelContextProvider>
+          <ModalContextProvider>
+            <div className="main-container">
+              <div className="filters-sidebar">
+                <div>
+                  <b>FILTERS</b>
+                </div>
+                <div className="search-container">
+                  <input
+                    type="text"
+                    placeholder="Search events..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <div className="filter-dropdown">
+                  <button onClick={() => setAllEventsOpen(!allEventsOpen)}>
+                    All Events
+                  </button>
+                  {allEventsOpen && (
+                    <div>
+                      {/* <input
                   type="checkbox"
                   id="all-events"
                   checked={showAllEvents}
                   onChange={handleAllEventsChange}
                 />
                 <label htmlFor="all-events"> Show All</label> */}
-                <ColorCheckbox
-                  id={`all-events`}
-                  checked={showAllEvents}
-                  onChange={handleAllEventsChange}
-                />
-              </div>
-            )}
-          </div>
-          <div className="filter-dropdown">
-            <button onClick={() => setAgeOpen(!ageOpen)}>Filter by Age</button>
-            {ageOpen &&
-              uniqueAges.map((age) => (
-                <div key={age}>
-                  {/* <input
+                      <ColorCheckbox
+                        id={`all-events`}
+                        checked={showAllEvents}
+                        onChange={handleAllEventsChange}
+                      />
+                    </div>
+                  )}
+                </div>
+                <div className="filter-dropdown">
+                  <button onClick={() => setAgeOpen(!ageOpen)}>
+                    Filter by Age
+                  </button>
+                  {ageOpen &&
+                    uniqueAges.map((age) => (
+                      <div key={age}>
+                        {/* <input
                     type="checkbox"
                     id={`age-${age}`}
                     checked={selectedAges.has(age)}
                     onChange={() => handleAgeChange(age)}
                   />
                   <label htmlFor={`age-${age}`}>{age}</label> */}
-                  <ColorCheckbox
-                    id={`age-${age}`}
-                    checked={selectedAges.has(age)}
-                    onChange={() => handleAgeChange(age)}
-                  />
+                        <ColorCheckbox
+                          id={`age-${age}`}
+                          checked={selectedAges.has(age)}
+                          onChange={() => handleAgeChange(age)}
+                        />
+                      </div>
+                    ))}
                 </div>
-              ))}
-          </div>
-          <div className="filter-dropdown">
-            <button onClick={() => setCategoryOpen(!categoryOpen)}>
-              Filter by Category
-            </button>
-            {categoryOpen &&
-              uniqueCategories.map((category) => (
-                <div key={category}>
-                  {/* <input
+                <div className="filter-dropdown">
+                  <button onClick={() => setCategoryOpen(!categoryOpen)}>
+                    Filter by Category
+                  </button>
+                  {categoryOpen &&
+                    uniqueCategories.map((category) => (
+                      <div key={category}>
+                        {/* <input
                     type="checkbox"
                     id={`category-${category}`}
                     checked={selectedCategories.has(category)}
                     onChange={() => handleCategoryChange(category)}
                   />
                   <label htmlFor={`category-${category}`}>{category}</label> */}
-                  <ColorCheckbox
-                    id={`category-${category}`}
-                    checked={selectedCategories.has(category)}
-                    onChange={() => handleLocationChange(category)}
-                  />
+                        <ColorCheckbox
+                          id={`category-${category}`}
+                          checked={selectedCategories.has(category)}
+                          onChange={() => handleLocationChange(category)}
+                        />
+                      </div>
+                    ))}
                 </div>
-              ))}
-          </div>
-          <div className="filter-dropdown">
-            <button onClick={() => setLocationOpen(!locationOpen)}>
-              Filter by Location
-            </button>
-            {locationOpen &&
-              uniqueCategories.map((location) => (
-                <div key={location}>
-                  {
-                    /* <input
+                <div className="filter-dropdown">
+                  <button onClick={() => setLocationOpen(!locationOpen)}>
+                    Filter by Location
+                  </button>
+                  {locationOpen &&
+                    uniqueCategories.map((location) => (
+                      <div key={location}>
+                        {
+                          /* <input
                     type="checkbox"
                     id={`category-${location}`}
                     checked={selectedCategories.has(location)}
                     onChange={() => handleLocationChange(location)}
                   /> */
-                    <ColorCheckbox
-                      id={`${location}`}
-                      checked={selectedCategories.has(location)}
-                      onChange={() => handleLocationChange(location)}
-                    />
-                  }
+                          <ColorCheckbox
+                            id={`${location}`}
+                            checked={selectedCategories.has(location)}
+                            onChange={() => handleLocationChange(location)}
+                          />
+                        }
 
                   {/* <label htmlFor={`Location-${location}`}>{location}</label> */}
                 </div>
@@ -372,6 +380,7 @@ function App() {
             style={{ zIndex: 0 }}
             
           />
+          <EventSidebar/>
           <EventModal
             show={modalVisible}
             onClose={closeModal}
@@ -385,7 +394,11 @@ function App() {
         </div>
         }
       </div>
+      </ModalContextProvider>
+      </PanelContextProvider>
+      </EventContextProvider>
     </div>
+
   );
 }
 

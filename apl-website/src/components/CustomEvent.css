@@ -1,8 +1,8 @@
 .container {
-  z-index: 0;
+  z-index: 0 !important;
   position: relative;
 } 
 
 .hoverable {
-  z-index: 0;
+  z-index: 0 !important;
 }
