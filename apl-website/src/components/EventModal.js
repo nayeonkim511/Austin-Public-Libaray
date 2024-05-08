@@ -99,7 +99,7 @@ const EventModal = ({ show, onClose, event }) => {
         {parsed}
         <div style={{textAlign: "center"}}>
           <Button
-              style={{  backgroundColor: "#ed0e0e", color: "#000000", filter: "saturate(0.7)", alignSelf: 'center' }}
+              style={{  backgroundColor: "#f23844", color: "#000000", filter: "saturate(0.9)", alignSelf: 'center' }}
               variant="contained"
               onClick={onClose}
               startIcon={<ClearIcon />}
